@@ -21,9 +21,10 @@ def subtotal(lines: list[Line]) -> int:
 
 def total(lines: list[Line], discount_pct: int = 0) -> int:
     """Subtotal, less the discount, plus tax and shipping, in cents."""
+    if not 0 <= discount_pct <= 100:
+        raise ValueError("discount_pct must be between 0 and 100")
     sub = subtotal(lines)
-    tax = round(sub * TAX_RATE)
-    shipping = 0 if sub >= FREE_SHIPPING_OVER_CENTS else SHIPPING_CENTS
-    gross = sub + tax + shipping
-    # Promo: take the discount off the whole basket.
-    return gross - gross * discount_pct // 100
+    discounted = sub - sub * discount_pct // 100
+    tax = round(discounted * TAX_RATE)
+    shipping = 0 if discounted >= FREE_SHIPPING_OVER_CENTS else SHIPPING_CENTS
+    return discounted + tax + shipping
